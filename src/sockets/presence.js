@@ -1,0 +1,1 @@
+export const notePresence = new Map();

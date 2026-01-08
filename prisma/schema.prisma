@@ -1,0 +1,54 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                String             @id @default(uuid())
+  name              String
+  email             String             @unique
+  password          String
+  role              Role               @default(USER)
+  createdAt         DateTime           @default(now())
+  notesOwned        Note[]
+  notesCollaborated NoteCollaborator[]
+}
+
+model Note {
+  id            String             @id @default(uuid())
+  title         String
+  content       String             @default("")
+  ownerId       String
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  isPublic      Boolean            @default(false)
+  shareToken    String?            @unique
+  owner         User               @relation(fields: [ownerId], references: [id])
+  collaborators NoteCollaborator[]
+}
+
+model NoteCollaborator {
+  id        String   @id @default(uuid())
+  noteId    String
+  userId    String
+  role      NoteRole @default(VIEWER)
+  createdAt DateTime @default(now())
+  note      Note     @relation(fields: [noteId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([noteId, userId])
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum NoteRole {
+  EDITOR
+  VIEWER
+}
