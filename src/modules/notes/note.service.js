@@ -158,7 +158,7 @@ export const deleteNote = async ({ noteId, userId, userRole }) => {
     const isOwner = note.ownerId === userId
     const isAdmin = userRole === "ADMIN"
 
-    if (!isOwner || !isAdmin) {
+    if (!isOwner && !isAdmin) {
         throw new Error("You don't have permission to delete this note")
     }
 
