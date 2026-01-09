@@ -1,5 +1,5 @@
 import prisma from "../../config/db.js";
-import { addCollaborator, createNote, deleteNote, generateShareLink, getCollaborator, getMyNotes, getNotesById, getSharedNote, removeCollaborator, uptNotes } from "./note.service.js";
+import { addCollaborator, createNote, deleteNote, generateShareLink, getCollaborator, getMyNotes, getNotesById, getSharedNote, removeCollaborator, searchNotesforUser, uptNotes } from "./note.service.js";
 
 export const createNoteController = async(req, res) => {
     try {
@@ -202,6 +202,25 @@ export const getSharedNoteController = async(req,res) => {
         })
         res.status(200).json({note})
     } catch (error) {
+        res.status(500).json({
+            message: error.message
+        })
+    }
+}
+
+export const searchNotesController = async(req,res) => {
+    try {
+        const {q} = req.query
+
+        const notes = await searchNotesforUser({
+            userId: req.user.id,
+            query: q
+        })
+
+        res.status(200).json({
+            notes
+        })
+    } catch(error) {
         res.status(500).json({
             message: error.message
         })

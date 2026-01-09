@@ -350,3 +350,53 @@ export const getSharedNote = async(token) => {
 
     return note
 }
+
+export const searchNotesforUser = async({userId, query}) => {
+    if (!query || query.trim === "") {
+        return []
+    }
+
+    return prisma.note.findMany({
+        where: {
+            AND: [
+                {
+                    OR: [
+                        {ownerId: userId},
+                        {
+                            collaborators: {
+                                some: {
+                                    userId: userId
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    OR: [
+                        {
+                            title: {
+                                contains: query,
+                                mode: "insensitive"
+                            }
+                        },
+                        {
+                            content: {
+                                contains: query,
+                                mode: "insensitive"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        orderBy: {
+            updatedAt: "desc"
+        },
+        select: {
+            id: true,
+            title: true,
+            updatedAt: true,
+            ownerId: true
+        }
+    })
+}

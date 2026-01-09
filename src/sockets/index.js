@@ -36,9 +36,10 @@ export const initSockets = (io) => {
                     where: { id: noteId },
                     include: { collaborators: true },
                 });
-
+                console.log(note)
+                console.log(noteId)
                 if (!note) {
-                    return socket.emit("join-error", "Note not found");
+                    return socket.emit("join-error", {message: "Note not found", noteId});
                 }
 
                 const isOwner = note.ownerId === socket.user.id;
