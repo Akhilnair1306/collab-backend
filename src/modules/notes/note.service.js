@@ -400,3 +400,53 @@ export const searchNotesforUser = async({userId, query}) => {
         }
     })
 }
+
+
+export const searchCollaboratorCandidates= async({noteId, requesterId, emailQuery}) => {
+    if (!emailQuery || emailQuery.trim().length < 2) {
+        return []
+    }
+
+    const note = await prisma.note.findUnique({
+        where: {
+            id: noteId
+        },
+        include: {
+            collaborators: true
+        }
+    })
+
+    if (!note) {
+        throw new Error("Note not found")
+    }
+
+    const isOwner = note.ownerId === requesterId
+    // const collaborator = note.collaborators.some(
+    //     (c) => c.userId ===
+    // )
+    if (!isOwner) {
+        throw new Error("Not allowed to add collabrator")
+    }
+
+    const excludedIds = [
+        note.ownerId,
+        ...note.collaborators.map((c) =>{c.userId})
+    ].filter(Boolean); 
+
+    return prisma.user.findMany({
+        where: {
+            email: {
+                contains: emailQuery,
+                mode: 'insensitive'
+            },
+            id: {
+                notIn: excludedIds
+            }
+        },
+        select: {
+            id: true,
+            email: true
+        },
+        take: 10,
+    })
+}

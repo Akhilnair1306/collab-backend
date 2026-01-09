@@ -1,6 +1,6 @@
 import express from 'express'
 import { authenticate } from '../../middleware/auth.middleware.js'
-import { addCollaboratorController, createNoteController, deleteCollaboratorController, deleteNoteController, generateShareLinkController, getCollaboratorController, getMyNoteByIdController, getMyNotesController, getSharedNoteController, searchNotesController, updateNotesController } from './note.controller.js'
+import { addCollaboratorController, createNoteController, deleteCollaboratorController, deleteNoteController, generateShareLinkController, getCollaboratorController, getMyNoteByIdController, getMyNotesController, getSharedNoteController, searchCollaboratorsController, searchNotesController, updateNotesController } from './note.controller.js'
 import { getAllNotesAdmin } from '../admin/admin.service.js';
 
 const noteRouter = express.Router()
@@ -17,6 +17,8 @@ noteRouter.put("/:noteId", authenticate, updateNotesController);
 noteRouter.delete("/:noteId", authenticate, deleteNoteController);
 
 // Collaborators 
+noteRouter.get( "/:noteId/collaborators/search", authenticate, searchCollaboratorsController );
+
 noteRouter.post("/:noteId/collaborator", authenticate, addCollaboratorController);
 noteRouter.get("/:noteId/collaborator", authenticate, getCollaboratorController);
 noteRouter.delete("/:noteId/collaborator/:collaboratorId",authenticate, deleteCollaboratorController)
